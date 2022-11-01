@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package msg;
+
+//Combine <-> NameNode
+
+message EnvioNombre{  //Request Combine -> NameNode //Request NameNode -> DataNode
+    string msg_type = 1;
+    string msg_id = 2;
+    string msg_msg = 3;
+}
+
+message ConfSave{ // Response NameNode -> Combine //Response DataNode -> NameNode
+    string confirmacion = 1;
+}
+
+message Peticion{ //Request Rebelde -> NameNode (Tipo info) // Request NameNode -> DataNode (ID)  
+    string pet = 1;
+}
+
+//NameNode <-> DataNode // DataNode <-> NameNode
+
+service GuardarDato{
+    // Se envia de Combine hasta NameNode / Se envia de NameNode hasta DataNode
+    rpc Guardar (EnvioNombre) returns (ConfSave);
+
+    //Envia peticion de NameNode hasta DataNode
+    rpc ObtenerInfoData (Peticion) returns (EnvioNombre);
+
+    //Envia Peticion de Rebelde hasta NameNode , devuelve stream
+    rpc ObtenerInfoName (Peticion) returns (stream EnvioNombre);
+
+    //Cierre de los programas
+    rpc Cierre (Peticion) returns (Peticion);
+}
